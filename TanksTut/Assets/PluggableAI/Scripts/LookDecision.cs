@@ -2,17 +2,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LookDecision : MonoBehaviour
+[CreateAssetMenu(menuName = "PluggableAI/Decisions/Look")]
+public class LookDecision : Decision
 {
-    // Start is called before the first frame update
-    void Start()
+
+    public override bool Decide(StateController controller)
     {
-        
+        bool targetVisible = Look(controller);
+        return targetVisible;
     }
 
-    // Update is called once per frame
-    void Update()
+    private bool Look(StateController controller)
     {
-        
+        RaycastHit hit;
+
+        Debug.DrawRay(controller.eyes.position, controller.eyes.forward.normalized * controller.enemyStats.lookRange, Color.green);
+
+
+        if (Physics.SphereCast(controller.eyes.position, controller.enemyStats.lookSphereCastRadius, controller.eyes.forward, out hit, controller.enemyStats.lookRange)
+           && hit.collider.CompareTag("Player"))
+        {
+            controller.chaseTarget = hit.transform;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
     }
+
 }
